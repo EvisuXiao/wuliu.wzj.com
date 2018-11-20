@@ -3,6 +3,24 @@
 
 define('LARAVEL_START', microtime(true));
 
+// 解析环境变量
+$conf_file = '/usr/local/etc/nginx/cron.conf'; // 上线需要改
+//$conf_file = '/data1/xinsrv/nginx/conf/fastcgi_web';
+if(file_exists($conf_file)) {
+    $conf = parse_ini_file($conf_file);
+    foreach($conf as $k => $v) {
+    	if(strpos($v, '$server_name') === false) {
+    		$_SERVER[$k] = $v;
+	    } else {
+            $_SERVER[$k] = str_replace('$server_name', 'wzj.wuliu.com', $v);
+        }
+    }
+    unset($conf, $k, $v);
+}
+unset($conf_file);
+isset($_SERVER['HTTP_HOST']) ||
+($_SERVER['HTTP_HOST'] = isset($_SERVER['SITE_ENV']) && $_SERVER['SITE_ENV'] == 'production' ? 'wzj.wuliu.com' : 'wzj.test.wuliu.com');
+
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader
