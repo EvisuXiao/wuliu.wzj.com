@@ -37,3 +37,17 @@ Route::group([
     Route::put('opt', 'UserController@opt');
     Route::put('reset', 'UserController@opt');
 });
+
+Route::group([
+    'prefix' => 'farmer',
+], function() {
+    Route::get('list', 'FarmerController@list');
+    Route::get('label', 'FarmerController@label');
+});
+
+Route::group([
+    'prefix' => 'dealer',
+], function() {
+    Route::get('list', 'DealerController@list');
+    Route::get('label', 'DealerController@label');
+});

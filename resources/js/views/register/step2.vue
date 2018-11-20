@@ -4,7 +4,6 @@
 			<el-step title="用户信息"></el-step>
 			<el-step title="基本信息"></el-step>
 			<el-step title="更多信息"></el-step>
-			<el-step title="完成"></el-step>
 		</el-steps>
 		<div align="center" :style="{ marginTop: '12px',display: uDisplay }">
 			<el-form ref="userForm" :model="userForm" label-width="150px" size="small">
@@ -18,14 +17,14 @@
 						<el-input type="password" v-model="userForm.password" clearable></el-input>
 					</el-col>
 				</el-form-item>
-				<el-form-item label="邮箱" prop="mail">
+				<el-form-item label="邮箱" prop="email">
 					<el-col :span="4">
-						<el-input v-model="userForm.mail" clearable></el-input>
+						<el-input v-model="userForm.email" clearable></el-input>
 					</el-col>
 				</el-form-item>
 				<el-form-item label="注册类别">
 					<el-col :span="4">
-						<el-select v-model="userForm.type" placeholder="请选择">
+						<el-select v-model="userForm.role" placeholder="请选择">
 							<el-option
 									v-for="item in options"
 									:key="item.value"
@@ -38,25 +37,25 @@
 			</el-form>
 		</div>
 		<div align="center" :style="{ marginTop: '12px',display: c1Display }">
-			<el-form ref="dealer1Form" :model="dealer1Form" label-width="150px" size="small">
-				<el-form-item label="企业名称" prop="name">
+			<el-form ref="company1Form" :model="company1Form" label-width="150px" size="small">
+				<el-form-item label="名称" prop="name">
 					<el-col :span="4">
-						<el-input v-model="dealer1Form.name" clearable></el-input>
+						<el-input v-model="company1Form.name" clearable></el-input>
 					</el-col>
 				</el-form-item>
 				<el-form-item label="注册号" prop="reg_no">
 					<el-col :span="4">
-						<el-input v-model="dealer1Form.reg_no" clearable></el-input>
+						<el-input v-model="company1Form.reg_no" clearable></el-input>
 					</el-col>
 				</el-form-item>
 				<el-form-item label="地址" prop="address">
 					<el-col :span="4">
-						<el-input v-model="dealer1Form.address" clearable></el-input>
+						<el-input v-model="company1Form.address" clearable></el-input>
 					</el-col>
 				</el-form-item>
 				<el-form-item label="电话" prop="phone">
 					<el-col :span="4">
-						<el-input v-model="dealer1Form.phone" clearable></el-input>
+						<el-input v-model="company1Form.phone" clearable></el-input>
 					</el-col>
 				</el-form-item>
 			</el-form>
@@ -117,19 +116,10 @@
 			</el-form>
 		</div>
 		<div align="center" :style="{ marginTop: '12px',display: b2Display }">
-			<el-form ref="bank1Form" :model="bank2Form" label-width="150px" size="small">
+			<el-form ref="bank2Form" :model="bank2Form" label-width="150px" size="small">
 				<el-form-item label="银行资产" prop="asset">
 					<el-col :span="4">
 						<el-input v-model="bank2Form.asset" clearable></el-input>
-					</el-col>
-				</el-form-item>
-			</el-form>
-		</div>
-		<div align="center" :style="{ marginTop: '12px',display: eDisplay }">
-			<el-form ref="endForm" :model="endForm" label-width="150px" size="small">
-				<el-form-item label="验证码" prop="code">
-					<el-col :span="4">
-						<el-input v-model="endForm.code" clearable></el-input>
 					</el-col>
 				</el-form-item>
 			</el-form>
@@ -140,6 +130,7 @@
 </template>
 
 <script>
+	import Request from '../../utils/request'
 	export default {
 		data() {
 			return {
@@ -164,8 +155,8 @@
 				userForm: {
 					username: '',
 					password: '',
-					mail: '',
-					type: 2
+					email: '',
+					role: 2
 				},
 				company1Form: {
 					name: '',
@@ -180,7 +171,6 @@
 				},
 				bank1Form: {
 					name: '',
-					reg_no: '',
 					bank: '',
 					branch: '',
 					address: '',
@@ -188,31 +178,48 @@
 				},
 				bank2Form: {
 					asset: 0
-				},
-				endForm: {
-					code: ''
-				},
+				}
 			}
 		},
 		methods: {
 			previous() {
-				if(this.active > 0 && this.active < 4) {
+				if(this.active > 0 && this.active < 3) {
 					this.active--
 				}
 			},
 			next() {
-				if(this.active < 4) {
+				if(this.active < 3) {
 					this.active++
-					if(this.active === 4) {
-						this.$message({
-							message: '注册成功',
-							type: 'success'
-						});
-						setTimeout(function() {
-							location.reload()
-						}, 3000);
+					if(this.active === 3) {
+						this.register()
 					}
 				}
+			},
+			register() {
+				let data = {
+					user: this.userForm
+				};
+				if(this.userForm.role === 2) {
+					data.info = this.company1Form;
+					data.extend = this.company2Form;
+				} else if(this.userForm.role === 3) {
+					data.info = this.bank1Form;
+					data.extend = this.bank2Form;
+				}
+				Request({
+					url: '/admin/register',
+					method: 'POST',
+					data: data
+				}).then(response => {
+					this.$message({
+						message: response.message,
+						type: 'success'
+					});
+					setTimeout(function() {
+						location.reload()
+					}, 3000);
+				}).catch(() => {
+				})
 			}
 		},
 		computed: {
@@ -223,25 +230,25 @@
 				return 'none';
 			},
 			c1Display: function() {
-				if(this.active === 1 && this.userForm.type === 2) {
+				if(this.active === 1 && this.userForm.role === 2) {
 					return '';
 				}
 				return 'none';
 			},
 			c2Display: function() {
-				if(this.active === 2 && this.userForm.type === 2) {
+				if(this.active === 2 && this.userForm.role === 2) {
 					return '';
 				}
 				return 'none';
 			},
 			b1Display: function() {
-				if(this.active === 1 && this.userForm.type === 3) {
+				if(this.active === 1 && this.userForm.role === 3) {
 					return '';
 				}
 				return 'none';
 			},
 			b2Display: function() {
-				if(this.active === 2 && this.userForm.type === 3) {
+				if(this.active === 2 && this.userForm.role === 3) {
 					return '';
 				}
 				return 'none';

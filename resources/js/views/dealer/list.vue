@@ -114,7 +114,7 @@
 			fetchData() {
 				this.listLoading = true;
 				request({
-					url: '/farmer/label'
+					url: '/dealer/label'
 				}).then(response => {
 					this.titles = response.data;
 					for(let title of this.titles) {
@@ -127,7 +127,7 @@
 			},
 			refreshTable() {
 				request({
-					url: '/farmer/list'
+					url: '/dealer/list'
 				}).then(response => {
 					this.data = response.data;
 					this.listLoading = false

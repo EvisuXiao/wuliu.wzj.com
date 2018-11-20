@@ -30,10 +30,6 @@
 
 <script>
 	import Request from '../../utils/request'
-	import Farmer from '../farmer/index'
-	import Company from '../company/index'
-	import User from '../user/index'
-	import Layout from '../layout/Layout'
 
 	export default {
 		data() {
@@ -52,60 +48,6 @@
 						{ min: 5, message: '密码长度不小于5个字符', trigger: 'blur' }
 					],
 				},
-				menu: {
-					1: [
-						{
-							path: '/user',
-							name: 'User',
-							redirect: '/user/index',
-							component: Layout,
-							meta: {title: '用户', icon: 'link'},
-							children: [
-								{
-									path: 'index',
-									component: User,
-									meta: {title: '用户列表', icon: 'link'}
-								}
-							]
-						},
-					],
-					2: [
-						{
-							path: '/company',
-							name: 'Company',
-							redirect: '/company/index',
-							component: Layout,
-							meta: {title: '企业', icon: 'link'},
-							children: [
-								{
-									path: 'index',
-									component: Company,
-									meta: {title: '企业列表', icon: 'link'}
-								}
-							]
-						},
-					],
-					3: [],
-					4: [
-						{
-							path: '/farmer',
-							name: 'Farmer',
-							redirect: '/farmer/index',
-							component: Layout,
-							meta: {title: '农户', icon: 'link'},
-							children: [
-								{
-									path: 'index',
-									component: Farmer,
-									meta: {title: '农户列表', icon: 'link'}
-								}
-							]
-						},
-					],
-					5: [
-
-					]
-				},
 				loading: false,
 			}
 		},
@@ -119,7 +61,7 @@
 							method: 'POST',
 							data: this.loginForm
 						}).then(response => {
-							this.$router.addRoutes(this.menu[response.data.role])
+							// this.$router.addRoutes(this.menu[response.data.role])
 							this.$router.push({path: '/'})
 							this.loading = false
 						}).catch(() => {

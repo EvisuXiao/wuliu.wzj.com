@@ -4,7 +4,9 @@ import NotFound from '../views/404'
 import Dashboard from '../views/dashboard/index'
 import Login from '../views/login/index'
 import Register from '../views/register/index'
-import Farmer from '../views/farmer/index'
+import Register2 from '../views/register/index2'
+import Farmer from '../views/farmer/list'
+import Dealer from '../views/dealer/list'
 import Company from '../views/company/index'
 import User from '../views/user/index'
 import {getUserInfo} from '../utils/auth'
@@ -57,7 +59,31 @@ export const constantRouterMap = [
 				path: 'index',
 				component: User,
 				meta: {title: '用户列表', icon: 'link'}
-			}
+			},
+			{
+				path: 'add',
+				component: Register2,
+				meta: {title: '添加用户', icon: 'link'}
+			},
+		]
+	},
+	{
+		path: '/company',
+		name: 'Company',
+		redirect: '/company/farmer',
+		component: Layout,
+		meta: {title: '核心企业', icon: 'link'},
+		children: [
+			{
+				path: 'farmer',
+				component: Farmer,
+				meta: {title: '农户列表', icon: 'link'}
+			},
+			{
+				path: 'dealer',
+				component: Dealer,
+				meta: {title: '经销商列表', icon: 'link'}
+			},
 		]
 	},
 	{path: '*', redirect: '/404', hidden: true}

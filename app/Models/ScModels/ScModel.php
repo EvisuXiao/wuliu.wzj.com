@@ -23,17 +23,17 @@ class ScModel extends BaseModel
         return !empty($list) ? $list[0] : [];
     }
 
-    public function getRecInfoById($id, $fields = [DB_SELECT_ALL], $master = false) {
+    public function getRecInfoById($id, $fields = [DB_SELECT_ALL]) {
         if(!is_array($id)) {
-            return $this->getRecInfo($fields, [$this->primaryKey => $id], [], $master);
+            return $this->getRecInfo($fields, [$this->primaryKey => $id]);
         }
-        return $this->getRecList($fields, ['in' => [$this->primaryKey => $id]], [], $master);
+        return $this->getRecList($fields, ['in' => [$this->primaryKey => $id]]);
     }
 
-    public function getRecList($fields = [DB_SELECT_ALL], $where = [], $order = [], $master = false) {
+    public function getRecList($fields = [DB_SELECT_ALL], $where = [], $order = []) {
         empty($order) && $order = [$this->primaryKey => DB_SORT_ASC];
-        $only_field = is_string($fields) && !Str::contains($fields, ',');
-        $list = $this->getAll($fields, $where, $order, [], 0, $master);
+        $only_field = is_string($fields) && !str_contains($fields, ',');
+        $list = $this->getAll($fields, $where, $order);
         if(empty($list)) {
             return [];
         }
