@@ -59,6 +59,7 @@
 						message: response.message
 					});
 					this.$router.push({path: '/login'})
+					location.reload()
 				})
 			}
 		}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Library\Utils;
+use App\Repositories\AdminRepository;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -37,6 +38,16 @@ class Controller extends BaseController
         'custom'    => []
     ];
     /**
+     * 登录id
+     * @var int
+     */
+    protected static $uid = 0;
+    /**
+     * 表头key
+     * @var string
+     */
+    protected $label = '';
+    /**
      * 请求方式
      * @var string
      */
@@ -48,6 +59,7 @@ class Controller extends BaseController
         $this->_setInput();
         $this->_apiValidator();
         $this->_setPayload();
+        self::$uid = AdminRepository::getLoginUid();
     }
 
     /**
@@ -83,9 +95,13 @@ class Controller extends BaseController
     }
 
     public function label() {
-        // 获取控制器名
-        $controller = Utils::getControllerAndAction();
-        $controller = $controller[0];
+        if(!empty($this->label)) {
+            $controller = $this->label;
+        } else {
+            // 获取控制器名
+            $controller = Utils::getControllerAndAction();
+            $controller = $controller[0];
+        }
         // 获取默认列
         $fields = config("{$controller}.field_title");
         if(empty($fields)) {

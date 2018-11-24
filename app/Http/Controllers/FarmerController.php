@@ -9,6 +9,8 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\ScModels\FarmerApplyModel;
+use App\Repositories\AdminRepository;
 use App\Repositories\FarmerRepository;
 
 class FarmerController extends Controller
@@ -22,5 +24,38 @@ class FarmerController extends Controller
 
     public function list() {
         return $this->succReturn($this->farmerRepository->getFarmerList());
+    }
+
+    public function info() {
+        return $this->succReturn($this->farmerRepository->getFarmerInfo());
+    }
+    
+    public function apply() {
+        if(self::isGet()) {
+            return $this->succReturn($this->farmerRepository->getFarmerApply());
+        } else {
+            $data = $this->payload;
+            unset($data['rest_amount']);
+            unset($data['available_amount']);
+            $data['id'] = self::$uid;
+            $data['status'] = FarmerApplyModel::STATUS_COMMITED;
+            self::isPost() ? $this->farmerRepository->farmerApplyModel->addRec($data) : $this->farmerRepository->farmerApplyModel->updateRec($data);
+        }
+        return $this->succReturn();
+    }
+
+    public function withdraw() {
+        if(self::isGet()) {
+            $list = $this->farmerRepository->farmerWithdrawModel->getRecList([DB_SELECT_ALL], ['farmer_id' => self::$uid]);
+            return $this->succReturn($list);
+        } else {
+            $do = $this->farmerRepository->doWithdraw($this->payload['amount'], $this->payload['purpose']);
+            return $do ? $this->succReturn() : $this->failReturn();
+        }
+    }
+
+    public function withdrawLabel() {
+        $this->label = 'farmerWithdraw';
+        return $this->label();
     }
 }

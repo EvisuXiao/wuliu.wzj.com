@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Repositories\AdminRepository;
 use App\Repositories\DealerRepository;
 
 class DealerController extends Controller
@@ -22,5 +23,9 @@ class DealerController extends Controller
 
     public function list() {
         return $this->succReturn($this->dealerRepository->getDealerList());
+    }
+
+    public function info() {
+        return $this->succReturn($this->dealerRepository->getDealerInfo(AdminRepository::getLoginUid()));
     }
 }

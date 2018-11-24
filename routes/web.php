@@ -43,6 +43,10 @@ Route::group([
 ], function() {
     Route::get('list', 'FarmerController@list');
     Route::get('label', 'FarmerController@label');
+    Route::get('info', 'FarmerController@info');
+    Route::match(['get', 'post', 'put'], 'apply', 'FarmerController@apply');
+    Route::match(['get', 'post'], 'withdraw', 'FarmerController@withdraw');
+    Route::get('withdrawLabel', 'FarmerController@withdrawLabel');
 });
 
 Route::group([
@@ -50,4 +54,5 @@ Route::group([
 ], function() {
     Route::get('list', 'DealerController@list');
     Route::get('label', 'DealerController@label');
+    Route::get('info', 'DealerController@info');
 });

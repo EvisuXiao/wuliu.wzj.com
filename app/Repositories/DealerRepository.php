@@ -32,4 +32,10 @@ class DealerRepository extends BaseRepository
         }
         return $data;
     }
+
+    public function getDealerInfo($id) {
+        $info = $this->dealerModel->getRecInfoById($id);
+        $more = $this->dealerExtendModel->getRecInfoById($id);
+        return array_merge($info, $more);
+    }
 }

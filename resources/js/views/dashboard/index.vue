@@ -26,9 +26,8 @@
 			}
 		},
 		created() {
-			let info = getUserInfo();
+			const info = getUserInfo();
 			if(info) {
-				info = JSON.parse(info);
 				this.username = info.username;
 				this.role = this.roleMap[info.role];
 				this.email = info.email;

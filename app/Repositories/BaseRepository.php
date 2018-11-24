@@ -11,5 +11,9 @@ namespace App\Repositories;
 
 class BaseRepository
 {
+    protected static $uid = 0;
 
+    public function __construct() {
+        self::$uid = AdminRepository::getLoginUid();
+    }
 }

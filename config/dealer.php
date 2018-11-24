@@ -18,6 +18,7 @@ return [
             'id'     => 60,
             'name'   => 200,
             'reg_no' => 160,
+            'asset' => 160,
         ],
         'sortable' => [
             'id'    => true,

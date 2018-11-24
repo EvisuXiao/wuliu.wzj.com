@@ -8,5 +8,6 @@ export function getToken() {
 }
 
 export function getUserInfo() {
-	return Cookies.get(UserKey)
+	const info = Cookies.get(UserKey);
+	return info ? JSON.parse(info) : '';
 }

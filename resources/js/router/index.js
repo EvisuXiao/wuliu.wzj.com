@@ -5,11 +5,13 @@ import Dashboard from '../views/dashboard/index'
 import Login from '../views/login/index'
 import Register from '../views/register/index'
 import Register2 from '../views/register/index2'
-import Farmer from '../views/farmer/list'
-import Dealer from '../views/dealer/list'
+import FarmerList from '../views/farmer/list'
+import FarmerInfo from '../views/farmer/info'
+import FarmerApply from '../views/farmer/apply'
+import FarmerWithdraw from '../views/farmer/withdraw'
+import DealerList from '../views/dealer/list'
 import Company from '../views/company/index'
 import User from '../views/user/index'
-import {getUserInfo} from '../utils/auth'
 /* Layout */
 import Layout from '../views/layout/Layout'
 
@@ -48,45 +50,6 @@ export const constantRouterMap = [
 			component: Dashboard,
 		}]
 	},
-	{
-		path: '/user',
-		name: 'User',
-		redirect: '/user/index',
-		component: Layout,
-		meta: {title: '用户', icon: 'link'},
-		children: [
-			{
-				path: 'index',
-				component: User,
-				meta: {title: '用户列表', icon: 'link'}
-			},
-			{
-				path: 'add',
-				component: Register2,
-				meta: {title: '添加用户', icon: 'link'}
-			},
-		]
-	},
-	{
-		path: '/company',
-		name: 'Company',
-		redirect: '/company/farmer',
-		component: Layout,
-		meta: {title: '核心企业', icon: 'link'},
-		children: [
-			{
-				path: 'farmer',
-				component: Farmer,
-				meta: {title: '农户列表', icon: 'link'}
-			},
-			{
-				path: 'dealer',
-				component: Dealer,
-				meta: {title: '经销商列表', icon: 'link'}
-			},
-		]
-	},
-	{path: '*', redirect: '/404', hidden: true}
 ];
 
 export default new Router({
@@ -94,3 +57,106 @@ export default new Router({
 	scrollBehavior: () => ({y: 0}),
 	routes: constantRouterMap
 })
+
+export const asyncRouterMap = {
+	1: [
+		{
+			path: '/user',
+			name: 'User',
+			redirect: '/user/index',
+			component: Layout,
+			meta: {title: '用户列表', icon: 'link'},
+			children: [
+				{
+					path: 'index',
+					component: User,
+					meta: {title: '用户列表', icon: 'link'}
+				}
+			]
+		},
+		{
+			path: '/user',
+			name: 'User-add',
+			redirect: '/user/add',
+			component: Layout,
+			meta: {title: '用户列表', icon: 'link'},
+			children: [
+				{
+					path: 'add',
+					component: Register2,
+					meta: {title: '添加用户', icon: 'link'}
+				},
+			]
+		}
+	],
+	2: [
+		{
+			path: '/company',
+			name: 'Company-farmer',
+			redirect: '/company/farmer',
+			component: Layout,
+			meta: {title: '农户列表', icon: 'link'},
+			children: [
+				{
+					path: 'farmer',
+					component: FarmerList,
+					meta: {title: '农户列表', icon: 'link'}
+				}
+			]
+		},
+		{
+			path: '/company',
+			name: 'Company-dealer',
+			redirect: '/company/dealer',
+			component: Layout,
+			meta: {title: '核心企业', icon: 'link'},
+			children: [
+				{
+					path: 'dealer',
+					component: DealerList,
+					meta: {title: '经销商列表', icon: 'link'}
+				},
+			]
+		},
+	],
+	4: [
+		{
+			path: '/farmer',
+			name: 'Farmer',
+			redirect: '/farmer/info',
+			component: Layout,
+			meta: {title: '生产信息', icon: 'link'},
+			children: [
+				{
+					path: 'info',
+					component: FarmerInfo,
+					meta: {title: '生产信息', icon: 'link'}
+				}
+			]
+		},
+		{
+			path: '/farmer/loan',
+			name: 'Farmer-loan',
+			redirect: '/farmer/loan/apply',
+			component: Layout,
+			meta: {title: '借贷信息', icon: 'link'},
+			children: [
+				{
+					path: 'apply',
+					component: FarmerApply,
+					meta: {title: '借款申请', icon: 'link'}
+				},
+				{
+					path: 'list',
+					component: FarmerWithdraw,
+					meta: {title: '提款列表', icon: 'link'}
+				}
+			]
+		},
+	]
+}
+
+export const notFoundRouterMap = [
+	{ path: '*', redirect: '/404', hidden: true }
+]
+

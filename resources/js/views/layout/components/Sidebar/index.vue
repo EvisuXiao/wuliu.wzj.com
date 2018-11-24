@@ -9,7 +9,7 @@
       text-color="#bfcbd9"
       active-text-color="#409EFF"
     >
-      <sidebar-item v-for="route in routes" :key="route.name" :item="route" :base-path="route.path"/>
+      <sidebar-item v-for="route in user_routers" :key="route.name" :item="route" :base-path="route.path"/>
     </el-menu>
   </el-scrollbar>
 </template>
@@ -22,11 +22,9 @@ export default {
   components: { SidebarItem },
   computed: {
     ...mapGetters([
-      'sidebar'
+      'sidebar',
+        'user_routers'
     ]),
-    routes() {
-      return this.$router.options.routes
-    },
     isCollapse() {
       return !this.sidebar.opened
     }
