@@ -33,8 +33,8 @@ class FarmerRepository extends BaseRepository
         $this->farmerWithdrawModel = $farmerWithdrawModel;
     }
 
-    public function getFarmerList() {
-        $list = $this->farmerModel->getRecList();
+    public function getFarmerList($id = []) {
+        $list = $this->farmerModel->getRecInfoById($id);
         $more = $this->farmerExtendModel->getInfoWithIndex(array_column($list, 'id'));
         $data = [];
         foreach($list as $item) {
@@ -57,12 +57,15 @@ class FarmerRepository extends BaseRepository
     }
 
     public function doWithdraw($amount, $purpose = '') {
+        $rate = 0.04;
         $apply = $this->farmerApplyModel->getRecInfoById(self::$uid);
         $rest = $apply['available_amount'] - $amount;
         if(empty($apply) || $apply['status'] != FarmerApplyModel::STATUS_PASSEDED || $rest < 0) {
             return false;
         }
-        return $this->farmerWithdrawModel->addWithdraw(self::$uid, $amount, $purpose)
+        $day = floor((strtotime($apply['expect_repaid_time']) - time()) / 86400);
+        $interest = round($amount * $rate * $day / 360, 2);
+        return $this->farmerWithdrawModel->addWithdraw(self::$uid, $amount, $interest, $purpose)
         && !empty($this->farmerApplyModel->updateRecById(self::$uid, ['available_amount' => $rest]));
     }
 }

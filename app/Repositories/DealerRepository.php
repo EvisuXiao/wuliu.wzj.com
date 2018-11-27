@@ -17,6 +17,7 @@ class DealerRepository extends BaseRepository
     protected $dealerExtendModel = null;
 
     public function __construct(DealerModel $dealerModel, DealerExtendModel $dealerExtendModel) {
+        parent::__construct();
         $this->dealerModel = $dealerModel;
         $this->dealerExtendModel = $dealerExtendModel;
     }

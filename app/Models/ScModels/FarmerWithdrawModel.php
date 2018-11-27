@@ -18,15 +18,15 @@ class FarmerWithdrawModel extends ScModel
     const STATUS_OVERDUE_UNREPAID = 2;
     const STATUS_OVERDUE_REPAID = 3;
 
-    public function addWithdraw($farmer_id, $amount, $purpose = '') {
+    public function addWithdraw($farmer_id, $amount, $interest, $purpose = '') {
         $status = self::STATUS_UNREPAID;
-        return $this->addRec(compact('farmer_id', 'amount', 'purpose', 'status'));
+        return $this->addRec(compact('farmer_id', 'amount', 'interest', 'purpose', 'status'));
     }
 
     public function getRecList($fields = [DB_SELECT_ALL], $where = [], $order = []) {
         $list = parent::getRecList($fields, $where, $order);
         foreach($list as &$item) {
-            if(isset($item['repaid_at']) && $item['repaid_at'] == '2000-01-01 00:00:00') {
+            if(isset($item['repaid_at']) && $item['repaid_at'] == DEFAULT_TIMESTAMP) {
                 $item['repaid_at'] = '';
             }
         }

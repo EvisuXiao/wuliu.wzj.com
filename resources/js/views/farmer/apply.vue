@@ -21,19 +21,63 @@
 					<el-input :disabled="formDisabled" v-model="form.purpose" clearable></el-input>
 				</el-col>
 			</el-form-item>
+			<el-form-item label="合同期限(月)" prop="loan_month">
+				<el-col :span="4">
+					<el-input :disabled="formDisabled" v-model="form.loan_month" clearable></el-input>
+				</el-col>
+			</el-form-item>
 			<el-form-item label="合同金额">
 				<el-col :span="4">
 					<el-input disabled :value="loanAmount"></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="可提取金额">
+			<el-form-item label="借款银行">
 				<el-col :span="4">
-					<el-input disabled :value="form.available_amount"></el-input>
+					<el-select :disabled="formDisabled" v-model="form.bank_id" placeholder="请选择">
+						<el-option
+								v-for="item in banks"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value">
+						</el-option>
+					</el-select>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="审批状态" prop="crop">
+			<div :style="{ display: form.status === 3 ? '' : 'none' }">
+				<el-form-item label="信用评级">
+					<el-col :span="4">
+						<el-input disabled :value="form.level"></el-input>
+					</el-col>
+				</el-form-item>
+				<el-form-item label="审批金额">
+					<el-col :span="4">
+						<el-input disabled :value="form.approval_amount"></el-input>
+					</el-col>
+				</el-form-item>
+				<el-form-item label="可提取金额">
+					<el-col :span="4">
+						<el-input disabled :value="form.available_amount"></el-input>
+					</el-col>
+				</el-form-item>
+				<el-form-item label="还款时间">
+					<el-col :span="4">
+						<el-input disabled :value="form.expect_repaid_time"></el-input>
+					</el-col>
+				</el-form-item>
+				<el-form-item label="审批时间">
+					<el-col :span="4">
+						<el-input disabled :value="form.passed_at"></el-input>
+					</el-col>
+				</el-form-item>
+			</div>
+			<el-form-item label="提交时间">
 				<el-col :span="4">
-					<el-tag :type="statusTag"> {{ statusShow }} </el-tag>
+					<el-input disabled :value="form.commited_at"></el-input>
+				</el-col>
+			</el-form-item>
+			<el-form-item label="审批状态" prop="status">
+				<el-col :span="4">
+					<el-tag :type="statusTag"> {{ statusShow }}</el-tag>
 				</el-col>
 			</el-form-item>
 			<el-form-item>
@@ -74,21 +118,30 @@
 					quantity: 0,
 					price: 0,
 					purpose: '',
+					loan_month: 0,
 					loan_amount: 0,
+					bank_id: '',
+					level: '',
+					approval_amount: 0,
 					available_amount: 0,
-					status: 0
+					expect_repaid_time: '',
+					commited_at: '',
+					passed_at: '',
+					status: 0,
 				},
 				form2: {
 					amount: 0,
 					purpose: ''
 				},
+				banks: [],
 				dialog: false
 			}
 		},
 		created() {
 			this.getInfo();
+			this.bankLabel();
 		},
-		computed:{
+		computed: {
 			formDisabled: function() {
 				return this.form.status === 1 || this.form.status === 3;
 			},
@@ -122,7 +175,26 @@
 					const data = response.data;
 					for(let i in this.form) {
 						if(data.hasOwnProperty(i)) {
-							this.form[i] = data[i];
+							if(i === 'bank_id' && data[i] === 0) {
+								this.form[i] = '';
+							} else {
+								this.form[i] = data[i];
+							}
+						}
+					}
+				})
+			},
+			bankLabel() {
+				request({
+					url: '/bank/list'
+				}).then(response => {
+					const data = response.data;
+					for(let i in data) {
+						if(data.hasOwnProperty(i)) {
+							this.banks = this.banks.concat({
+								value: data[i].id,
+								label: data[i].name,
+							});
 						}
 					}
 				})
@@ -148,7 +220,8 @@
 						});
 						this.getInfo()
 					})
-				}).catch(() => {});
+				}).catch(() => {
+				});
 			},
 			onWithdraw() {
 				this.$confirm('是否确定提款', '提示', {
@@ -174,7 +247,8 @@
 						this.closeDialog()
 						this.getInfo()
 					})
-				}).catch(() => {});
+				}).catch(() => {
+				});
 			},
 		}
 	}

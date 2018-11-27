@@ -5,6 +5,7 @@ import Dashboard from '../views/dashboard/index'
 import Login from '../views/login/index'
 import Register from '../views/register/index'
 import Register2 from '../views/register/index2'
+import BankFarmer from '../views/bank/farmer'
 import FarmerList from '../views/farmer/list'
 import FarmerInfo from '../views/farmer/info'
 import FarmerApply from '../views/farmer/apply'
@@ -116,6 +117,22 @@ export const asyncRouterMap = {
 					component: DealerList,
 					meta: {title: '经销商列表', icon: 'link'}
 				},
+			]
+		},
+	],
+	3: [
+		{
+			path: '/bank',
+			name: 'Bank-apply',
+			redirect: '/bank/farmer',
+			component: Layout,
+			meta: {title: '借款审核', icon: 'link'},
+			children: [
+				{
+					path: 'farmer',
+					component: BankFarmer,
+					meta: {title: '农户申请', icon: 'link'}
+				}
 			]
 		},
 	],

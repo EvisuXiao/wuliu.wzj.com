@@ -33,6 +33,31 @@
 				</template>
 			</el-table-column>
 		</data-tables>
+		<el-dialog title="审核信息" :visible="dialog" :before-close="closeDialog">
+			<el-form ref="form" :model="form" label-width="150px" size="small">
+				<el-form-item label="信用评级" prop="level">
+					<el-col :span="8">
+						<el-select v-model="form.level" placeholder="请选择">
+							<el-option
+									v-for="i of levelEnum"
+									:key="i"
+									:label="i"
+									:value="i">
+							</el-option>
+						</el-select>
+					</el-col>
+				</el-form-item>
+				<el-form-item label="审批金额" prop="crop">
+					<el-col :span="8">
+						<el-input v-model="form.approval_amount" clearable></el-input>
+					</el-col>
+				</el-form-item>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click="closeDialog" size="small">取 消</el-button>
+				<el-button type="primary" @click="rowOpt(3, form.id)" size="small">确 定</el-button>
+			</div>
+		</el-dialog>
 	</div>
 </template>
 
@@ -58,6 +83,21 @@
 						order: 'descending'
 					}
 				},
+				form: {
+					id: 0,
+					loan_month: 0,
+					level: 'A',
+				    approval_amount: 0,
+				},
+				levelEnum: [
+					'A',
+					'B',
+					'C',
+					'D',
+					'E',
+					'F'
+				],
+				dialog: false,
 				listLoading: true,
 				headerTool: [
 					// {
@@ -79,12 +119,22 @@
 					buttons: [
 						{
 							visible: row => {
-								return row.status === 0 || row.status === 2
+								return row.status === 1
 							},
-							label: '还款',
+							label: '通过',
 							icon: 'el-icon-check',
 							handler: row => {
-								this.rowOpt(row.status === 0 ? 1 : 3, row.id)
+								this.openDialog(row)
+							},
+						},
+						{
+							visible: row => {
+								return row.status === 1
+							},
+							label: '驳回',
+							icon: 'el-icon-close',
+							handler: row => {
+								this.rowOpt(2, row.id)
 							},
 						}
 					]
@@ -107,7 +157,7 @@
 			fetchData() {
 				this.listLoading = true;
 				request({
-					url: '/farmer/withdrawLabel'
+					url: '/bank/farmerApplyLabel'
 				}).then(response => {
 					this.titles = response.data;
 					for(let title of this.titles) {
@@ -118,9 +168,41 @@
 				})
 				this.refreshTable()
 			},
+			statusClass(status) {
+				const map = {
+					0: 'info',
+					1: '',
+					2: 'warning',
+					3: 'success'
+				};
+				return map[status]
+			},
+			statusFormatter(status) {
+				const map = {
+					0: '未提交',
+					1: '已提交',
+					2: '被驳回',
+					3: '已通过'
+				};
+				return map[status]
+			},
+			openDialog(row) {
+				this.form.id = row.id;
+				this.form.loan_month = row.loan_month;
+				this.form.level = row.level;
+				this.form.approval_amount = row.loan_amount;
+				this.dialog = true;
+			},
+			closeDialog() {
+				this.form.id = 0;
+				this.form.loan_month = 0;
+				this.form.level = 'A';
+				this.form.approval_amount = 0;
+				this.dialog = false;
+			},
 			refreshTable() {
 				request({
-					url: '/farmer/withdraw'
+					url: '/bank/farmerApply'
 				}).then(response => {
 					this.data = response.data;
 					this.listLoading = false
@@ -137,49 +219,39 @@
 					this.multiSelection.push(row.id);
 				}
 			},
-			statusClass(status) {
-				const map = {
-					0: 'info',
-					1: 'success',
-					2: 'danger',
-					3: 'warning'
-				};
-				return map[status]
-			},
-			statusFormatter(status) {
-				const map = {
-					0: '未还款',
-					1: '已还款',
-					2: '逾期未还款',
-					3: '逾期已还款'
-				};
-				return map[status]
-			},
 			rowOpt(opt, id) {
 				if(id < 1) {
 					this.$message({
 						type: 'warning',
-						message: '记录有误'
+						message: '申请有误'
 					});
 					return;
 				}
-				const cfm = '是否还款';
+				const labelMsg = {
+					'2': '驳回',
+					'3': '通过'
+				};
+				const cfm = '是否' + labelMsg[opt] + '申请';
 				this.$confirm(cfm, '提示', {
 					confirmButtonText: '确定',
 					cancelButtonText: '取消',
 				}).then(() => {
 					request({
-						url: '/farmer/repay',
+						url: '/bank/opt',
 						method: 'PUT',
 						data: {
 							id: id,
-							type: opt
+							type: opt,
+							info: this.form
 						}
 					}).then(response => {
 						this.$message({
 							type: 'success',
 							message: response.message
 						});
+						if(opt === 3) {
+							this.closeDialog();
+						}
 						this.refreshTable()
 					}).catch(() => {
 					})

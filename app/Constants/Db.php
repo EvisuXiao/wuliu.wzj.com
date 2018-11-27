@@ -18,3 +18,7 @@ defined('DB_SORT_ASC') || define('DB_SORT_ASC', 'asc');
  * 数据库降序
  */
 defined('DB_SORT_DESC') || define('DB_SORT_DESC', 'desc');
+/**
+ * 默认时间戳
+ */
+defined('DEFAULT_TIMESTAMP') || define('DEFAULT_TIMESTAMP', '2000-01-01 00:00:00');

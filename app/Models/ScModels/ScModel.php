@@ -18,12 +18,15 @@ class ScModel extends BaseModel
     protected $name_field = 'name';
 
 
-    public function getRecInfo($fields = [DB_SELECT_ALL], $where = [], $order = [], $master = false) {
-        $list = $this->getRecList($fields, $where, $order, $master);
+    public function getRecInfo($fields = [DB_SELECT_ALL], $where = [], $order = []) {
+        $list = $this->getRecList($fields, $where, $order);
         return !empty($list) ? $list[0] : [];
     }
 
     public function getRecInfoById($id, $fields = [DB_SELECT_ALL]) {
+        if(empty($id)) {
+            return $this->getRecList($fields);
+        }
         if(!is_array($id)) {
             return $this->getRecInfo($fields, [$this->primaryKey => $id]);
         }

@@ -17,4 +17,20 @@ class FarmerApplyModel extends ScModel
     const STATUS_COMMITED = 1;
     const STATUS_REJECTED = 2;
     const STATUS_PASSEDED = 3;
+
+    public function getRecList($fields = [DB_SELECT_ALL], $where = [], $order = []) {
+        $list = parent::getRecList($fields, $where, $order);
+        foreach($list as &$item) {
+            if(isset($item['commited_at']) && $item['commited_at'] == DEFAULT_TIMESTAMP) {
+                $item['commited_at'] = '';
+            }
+            if(isset($item['passed_at']) && $item['passed_at'] == DEFAULT_TIMESTAMP) {
+                $item['passed_at'] = '';
+            }
+            if(isset($item['expect_repaid_time']) && $item['expect_repaid_time'] == DEFAULT_TIMESTAMP) {
+                $item['expect_repaid_time'] = '';
+            }
+        }
+        return $list;
+    }
 }

@@ -35,9 +35,11 @@ class FarmerController extends Controller
             return $this->succReturn($this->farmerRepository->getFarmerApply());
         } else {
             $data = $this->payload;
-            unset($data['rest_amount']);
+            unset($data['rest_amount'], $data['level'], $data['approval_amount'],
+                $data['available_amount'], $data['expect_repaid_time'], $data['passed_at']);
             unset($data['available_amount']);
             $data['id'] = self::$uid;
+            $data['commited_at'] = datetimeNow();
             $data['status'] = FarmerApplyModel::STATUS_COMMITED;
             self::isPost() ? $this->farmerRepository->farmerApplyModel->addRec($data) : $this->farmerRepository->farmerApplyModel->updateRec($data);
         }
@@ -57,5 +59,14 @@ class FarmerController extends Controller
     public function withdrawLabel() {
         $this->label = 'farmerWithdraw';
         return $this->label();
+    }
+
+    public function repay() {
+        $data = [
+            'status'    => $this->payload['type'],
+            'repaid_at' => datetimeNow()
+        ];
+        $this->farmerRepository->farmerWithdrawModel->updateRecById($this->payload['id'], $data);
+        return $this->succReturn();
     }
 }
