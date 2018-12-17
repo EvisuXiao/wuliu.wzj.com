@@ -11,12 +11,7 @@
 					<el-input v-model="form.land" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="单价(元/千克)" prop="price">
-				<el-col :span="4">
-					<el-input v-model="form.price" clearable></el-input>
-				</el-col>
-			</el-form-item>
-			<el-form-item label="产能(千克/亩)" prop="productivity">
+			<el-form-item label="产出能力(千克/亩)" prop="productivity">
 				<el-col :span="4">
 					<el-input v-model="form.productivity" clearable></el-input>
 				</el-col>

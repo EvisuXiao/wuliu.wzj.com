@@ -72,9 +72,19 @@
 						<el-input v-model="company2Form.product" clearable></el-input>
 					</el-col>
 				</el-form-item>
-				<el-form-item label="注册资金" prop="asset">
+				<el-form-item label="产品销量" prop="sales">
+					<el-col :span="4">
+						<el-input v-model="company2Form.sales" clearable></el-input>
+					</el-col>
+				</el-form-item>
+				<el-form-item label="企业资产" prop="asset">
 					<el-col :span="4">
 						<el-input v-model="company2Form.asset" clearable></el-input>
+					</el-col>
+				</el-form-item>
+				<el-form-item label="企业负债" prop="debt">
+					<el-col :span="4">
+						<el-input v-model="company2Form.debt" clearable></el-input>
 					</el-col>
 				</el-form-item>
 			</el-form>
@@ -167,7 +177,9 @@
 				company2Form: {
 					material: '',
 					product: '',
-					asset: 0
+					sales: 0,
+					asset: 0,
+					debt: 0
 				},
 				bank1Form: {
 					name: '',

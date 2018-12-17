@@ -6,6 +6,9 @@ import Login from '../views/login/index'
 import Register from '../views/register/index'
 import Register2 from '../views/register/index2'
 import BankFarmer from '../views/bank/farmer'
+import BankScore from '../views/bank/score'
+import BankCfg from '../views/bank/cfg'
+import BankPool from '../views/bank/pool'
 import FarmerList from '../views/farmer/list'
 import FarmerInfo from '../views/farmer/info'
 import FarmerApply from '../views/farmer/apply'
@@ -135,6 +138,30 @@ export const asyncRouterMap = {
 				}
 			]
 		},
+		{
+			path: '/bank',
+			name: 'Bank-score',
+			redirect: '/bank/score',
+			component: Layout,
+			meta: {title: '权重管理', icon: 'link'},
+			children: [
+				{
+					path: 'score',
+					component: BankScore,
+					meta: {title: '当前权重', icon: 'link'}
+				},
+				{
+					path: 'pool',
+					component: BankPool,
+					meta: {title: '打分池', icon: 'link'}
+				},
+				{
+					path: 'cfg',
+					component: BankCfg,
+					meta: {title: '权重配置', icon: 'link'}
+				}
+			]
+		}
 	],
 	4: [
 		{

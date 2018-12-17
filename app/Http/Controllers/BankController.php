@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\ScModels\BankScoreCfgModel;
 use App\Models\ScModels\FarmerApplyModel;
 use App\Repositories\BankRepository;
 
@@ -49,6 +50,36 @@ class BankController extends Controller
             $data['expect_repaid_time'] = date('Y-m-d 00:00:00', strtotime(sprintf('+%d months', $info['loan_month'])));
         }
         $this->bankRepository->farmerRepository->farmerApplyModel->updateRecById($this->payload['id'], $data);
+        return $this->succReturn();
+    }
+
+    public function applyScore() {
+        $apply = $this->bankRepository->getFarmerApply($this->payload['id']);
+        $this->bankRepository->scorePool(array_only($apply, array_keys(BankScoreCfgModel::$score_type)));
+        $score = $this->bankRepository->getAvgScore();
+        $level = $this->bankRepository->getLevel($score);
+        return $this->succReturn(compact('score', 'level'));
+    }
+
+    public function score() {
+        return $this->succReturn($this->bankRepository->getScore());
+    }
+
+    public function pool() {
+        try {
+            $this->bankRepository->scorePool($this->payload);
+            return $this->succReturn();
+        } catch(\Exception $e) {
+            return $this->failReturn($e->getMessage() . $e->getLine());
+        }
+    }
+
+    public function cfg() {
+        if(self::isGet()) {
+            return $this->succReturn($this->bankRepository->getScoreCfg());
+        } else {
+            $this->bankRepository->bankScoreCfgModel->updateRec($this->payload);
+        }
         return $this->succReturn();
     }
 }

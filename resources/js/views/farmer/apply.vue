@@ -6,6 +6,11 @@
 					<el-input disabled v-model="form.rest_amount" clearable></el-input>
 				</el-col>
 			</el-form-item>
+			<el-form-item label="人工效率(亩/人)" prop="efficiency">
+				<el-col :span="4">
+					<el-input :disabled="formDisabled" v-model="form.efficiency" clearable></el-input>
+				</el-col>
+			</el-form-item>
 			<el-form-item label="订单数量(千克)" prop="quantity">
 				<el-col :span="4">
 					<el-input :disabled="formDisabled" v-model="form.quantity" clearable></el-input>
@@ -29,6 +34,18 @@
 			<el-form-item label="合同金额">
 				<el-col :span="4">
 					<el-input disabled :value="loanAmount"></el-input>
+				</el-col>
+			</el-form-item>
+			<el-form-item label="生产企业">
+				<el-col :span="4">
+					<el-select :disabled="formDisabled" v-model="form.company_id" placeholder="请选择">
+						<el-option
+								v-for="item in companys"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value">
+						</el-option>
+					</el-select>
 				</el-col>
 			</el-form-item>
 			<el-form-item label="借款银行">
@@ -115,11 +132,13 @@
 				form: {
 					id: 0,
 					rest_amount: 0,
+					efficiency: 0,
 					quantity: 0,
 					price: 0,
 					purpose: '',
 					loan_month: 0,
 					loan_amount: 0,
+					company_id: '',
 					bank_id: '',
 					level: '',
 					approval_amount: 0,
@@ -133,6 +152,7 @@
 					amount: 0,
 					purpose: ''
 				},
+				companys: [],
 				banks: [],
 				dialog: false
 			}
@@ -140,6 +160,7 @@
 		created() {
 			this.getInfo();
 			this.bankLabel();
+			this.companyLabel();
 		},
 		computed: {
 			formDisabled: function() {
@@ -192,6 +213,21 @@
 					for(let i in data) {
 						if(data.hasOwnProperty(i)) {
 							this.banks = this.banks.concat({
+								value: data[i].id,
+								label: data[i].name,
+							});
+						}
+					}
+				})
+			},
+			companyLabel() {
+				request({
+					url: '/company/list'
+				}).then(response => {
+					const data = response.data;
+					for(let i in data) {
+						if(data.hasOwnProperty(i)) {
+							this.companys = this.companys.concat({
 								value: data[i].id,
 								label: data[i].name,
 							});

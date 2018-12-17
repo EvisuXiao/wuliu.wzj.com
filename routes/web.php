@@ -64,6 +64,17 @@ Route::group([
     Route::get('label', 'BankController@label');
     Route::get('info', 'BankController@info');
     Route::put('opt', 'BankController@opt');
+    Route::get('applyScore', 'BankController@applyScore');
+    Route::get('score', 'BankController@score');
+    Route::match(['get', 'put'], 'cfg', 'BankController@cfg');
+    Route::post('pool', 'BankController@pool');
     Route::get('farmerApply', 'BankController@farmerApply');
     Route::get('farmerApplyLabel', 'BankController@farmerApplyLabel');
+});
+
+Route::group([
+    'prefix' => 'company',
+], function() {
+    Route::get('list', 'CompanyController@list');
+    Route::get('info', 'CompanyController@info');
 });

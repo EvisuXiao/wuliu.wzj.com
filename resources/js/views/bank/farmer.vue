@@ -35,21 +35,19 @@
 		</data-tables>
 		<el-dialog title="审核信息" :visible="dialog" :before-close="closeDialog">
 			<el-form ref="form" :model="form" label-width="150px" size="small">
+				<el-form-item label="信用评分">
+					<el-col :span="8">
+						<el-input disabled v-model="applyScore"></el-input>
+					</el-col>
+				</el-form-item>
 				<el-form-item label="信用评级" prop="level">
 					<el-col :span="8">
-						<el-select v-model="form.level" placeholder="请选择">
-							<el-option
-									v-for="i of levelEnum"
-									:key="i"
-									:label="i"
-									:value="i">
-							</el-option>
-						</el-select>
+						<el-input disabled v-model="form.level"></el-input>
 					</el-col>
 				</el-form-item>
 				<el-form-item label="审批金额" prop="crop">
 					<el-col :span="8">
-						<el-input v-model="form.approval_amount" clearable></el-input>
+						<el-input disabled v-model="form.approval_amount"></el-input>
 					</el-col>
 				</el-form-item>
 			</el-form>
@@ -86,17 +84,10 @@
 				form: {
 					id: 0,
 					loan_month: 0,
-					level: 'A',
+					level: '',
 				    approval_amount: 0,
 				},
-				levelEnum: [
-					'A',
-					'B',
-					'C',
-					'D',
-					'E',
-					'F'
-				],
+				applyScore: 0,
 				dialog: false,
 				listLoading: true,
 				headerTool: [
@@ -187,17 +178,27 @@
 				return map[status]
 			},
 			openDialog(row) {
-				this.form.id = row.id;
-				this.form.loan_month = row.loan_month;
-				this.form.level = row.level;
-				this.form.approval_amount = row.loan_amount;
-				this.dialog = true;
+				request({
+					url: '/bank/applyScore',
+					params: {
+						id: row.id
+					}
+				}).then(response => {
+					this.form.id = row.id;
+					this.form.loan_month = row.apply_loan_month;
+					this.form.level = response.data.level;
+					this.form.approval_amount = Math.round(parseInt(row.apply_loan_amount) * parseFloat(response.data.score));
+					this.applyScore = response.data.score;
+					this.dialog = true;
+				}).catch(() => {
+				})
 			},
 			closeDialog() {
 				this.form.id = 0;
 				this.form.loan_month = 0;
-				this.form.level = 'A';
+				this.form.level = '';
 				this.form.approval_amount = 0;
+				this.applyScore = 0;
 				this.dialog = false;
 			},
 			refreshTable() {

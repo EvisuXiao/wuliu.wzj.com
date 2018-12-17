@@ -45,9 +45,10 @@ class FarmerRepository extends BaseRepository
         return $data;
     }
 
-    public function getFarmerInfo() {
-        $info = $this->farmerModel->getRecInfoById(self::$uid);
-        $more = $this->farmerExtendModel->getRecInfoById(self::$uid);
+    public function getFarmerInfo($id = 0) {
+        $id = $id ?: self::$uid;
+        $info = $this->farmerModel->getRecInfoById($id);
+        $more = $this->farmerExtendModel->getRecInfoById($id);
         return array_merge($info, $more);
     }
 
