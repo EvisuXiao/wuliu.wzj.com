@@ -21,6 +21,7 @@ class AdminRepository extends BaseRepository
     protected $userModel = null;
 
     public function __construct(UserModel $userModel) {
+        parent::__construct();
         $this->userModel = $userModel;
     }
 

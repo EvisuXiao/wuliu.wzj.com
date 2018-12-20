@@ -73,11 +73,6 @@
 						<el-input v-model="farmer2Form.land" clearable></el-input>
 					</el-col>
 				</el-form-item>
-				<el-form-item label="单价(元/千克)" prop="price">
-					<el-col :span="4">
-						<el-input v-model="farmer2Form.price" clearable></el-input>
-					</el-col>
-				</el-form-item>
 				<el-form-item label="产能(千克/亩)" prop="productivity">
 					<el-col :span="4">
 						<el-input v-model="farmer2Form.productivity" clearable></el-input>
@@ -173,7 +168,6 @@
 				farmer2Form: {
 					land: 0,
 					crop: '',
-					price: 0,
 					productivity: 0,
 					cost: 0,
 					asset: 0

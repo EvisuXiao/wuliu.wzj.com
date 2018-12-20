@@ -80,7 +80,7 @@ class BankRepository extends BaseRepository
                 'id'                  => $farmer['id'],
                 'name'                => $farmer['name'],
                 'id_card'             => $farmer['id_card'],
-                'crop'                => $farmer['id_card'],
+                'crop'                => $farmer['crop'],
                 'company_id'          => $company['id'],
                 'company_name'        => $company['name'],
                 'company_sales'       => $company['sales'],
