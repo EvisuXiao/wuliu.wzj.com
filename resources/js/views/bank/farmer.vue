@@ -26,8 +26,11 @@
 			</el-table-column>
 			<el-table-column v-for="title in titles" :key="title.prop" v-bind="title">
 				<template slot-scope="scope">
-					<el-tag v-if="title.prop === 'status'" :type="statusClass(scope.row.status)">{{
-						statusFormatter(scope.row.status) }}
+					<el-tag v-if="title.prop === 'status'" :type="statusClass(scope.row.status, 1)">{{
+						statusFormatter(scope.row.status, 1) }}
+					</el-tag>
+					<el-tag v-else-if="title.prop === 'repaid_status'" :type="statusClass(scope.row.status, 2)">{{
+						statusFormatter(scope.row.status, 2) }}
 					</el-tag>
 					<span v-else>{{ scope.row[title.prop] }}</span>
 				</template>
@@ -37,7 +40,7 @@
 			<el-form ref="form" :model="form" label-width="150px" size="small">
 				<el-form-item label="信用评分">
 					<el-col :span="8">
-						<el-input disabled v-model="applyScore"></el-input>
+						<el-input disabled v-model="form.score"></el-input>
 					</el-col>
 				</el-form-item>
 				<el-form-item label="信用评级" prop="level">
@@ -84,10 +87,10 @@
 				form: {
 					id: 0,
 					loan_month: 0,
+					score: 0,
 					level: '',
 				    approval_amount: 0,
 				},
-				applyScore: 0,
 				dialog: false,
 				listLoading: true,
 				headerTool: [
@@ -127,6 +130,16 @@
 							handler: row => {
 								this.rowOpt(2, row.id)
 							},
+						},
+						{
+							visible: row => {
+								return (row.repaid_status === 1 || row.repaid_status === 3) && row.summary === 0
+							},
+							label: '结算',
+							icon: 'el-icon-circle-check',
+							handler: row => {
+								this.summary(row.id)
+							},
 						}
 					]
 				},
@@ -159,23 +172,35 @@
 				})
 				this.refreshTable()
 			},
-			statusClass(status) {
-				const map = {
+			statusClass(status, type) {
+				const map1 = {
 					0: 'info',
 					1: '',
 					2: 'warning',
 					3: 'success'
 				};
-				return map[status]
+				const map2 = {
+					0: 'info',
+					1: 'success',
+					2: 'danger',
+					3: 'warning'
+				};
+				return type === 1 ? map1[status] : map2[status]
 			},
-			statusFormatter(status) {
-				const map = {
+			statusFormatter(status, type) {
+				const map1 = {
 					0: '未提交',
 					1: '已提交',
 					2: '被驳回',
 					3: '已通过'
 				};
-				return map[status]
+				const map2 = {
+					0: '未还款',
+					1: '已还款',
+					2: '逾期未还款',
+					3: '逾期已还款'
+				};
+				return type === 1 ? map1[status] : map2[status]
 			},
 			openDialog(row) {
 				request({
@@ -186,9 +211,9 @@
 				}).then(response => {
 					this.form.id = row.id;
 					this.form.loan_month = row.apply_loan_month;
+					this.form.score = response.data.score;
 					this.form.level = response.data.level;
 					this.form.approval_amount = Math.round(parseInt(row.apply_loan_amount) * parseFloat(response.data.score));
-					this.applyScore = response.data.score;
 					this.dialog = true;
 				}).catch(() => {
 				})
@@ -196,9 +221,9 @@
 			closeDialog() {
 				this.form.id = 0;
 				this.form.loan_month = 0;
+				this.form.score = 0;
 				this.form.level = '';
 				this.form.approval_amount = 0;
-				this.applyScore = 0;
 				this.dialog = false;
 			},
 			refreshTable() {
@@ -253,6 +278,35 @@
 						if(opt === 3) {
 							this.closeDialog();
 						}
+						this.refreshTable()
+					}).catch(() => {
+					})
+				}).catch(() => {
+				});
+			},
+			summary(id) {
+				if(id < 1) {
+					this.$message({
+						type: 'warning',
+						message: '结算有误'
+					});
+					return;
+				}
+				this.$confirm('是否进行结算', '提示', {
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+				}).then(() => {
+					request({
+						url: '/bank/summary',
+						method: 'PUT',
+						data: {
+							id: id
+						}
+					}).then(response => {
+						this.$message({
+							type: 'success',
+							message: response.message
+						});
 						this.refreshTable()
 					}).catch(() => {
 					})

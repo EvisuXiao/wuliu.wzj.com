@@ -10,16 +10,19 @@ namespace App\Repositories;
 
 use App\Models\ScModels\CompanyExtendModel;
 use App\Models\ScModels\CompanyModel;
+use App\Models\ScModels\FarmerApplyModel;
 
 class CompanyRepository extends BaseRepository
 {
     public $companyModel = null;
     public $companyExtendModel = null;
+    public $farmerRepository = null;
 
     public function __construct(CompanyModel $companyModel, CompanyExtendModel $companyExtendModel, FarmerRepository $farmerRepository) {
         parent::__construct();
         $this->companyModel = $companyModel;
         $this->companyExtendModel = $companyExtendModel;
+        $this->farmerRepository = $farmerRepository;
     }
 
     public function getCompanyList() {
@@ -38,5 +41,27 @@ class CompanyRepository extends BaseRepository
         $info = $this->companyModel->getRecInfoById($id);
         $more = $this->companyExtendModel->getRecInfoById($id);
         return array_merge($info, $more);
+    }
+
+    public function getFarmerList() {
+        $apply = $this->farmerRepository->farmerApplyModel->getRecList(['id', 'loan_amount', 'repaid_status'], ['company_id' => self::$uid, 'status' => FarmerApplyModel::STATUS_PASSEDED]);
+        if(empty($apply)) {
+            return [];
+        }
+        $farmer = $this->farmerRepository->getFarmerList(array_column($apply,'id'));
+        $apply = array_column($apply, null, 'id');
+        foreach($farmer as &$item) {
+            $item['repaid_status'] = $apply[$item['id']]['repaid_status'];
+            $item['loan_amount'] = $apply[$item['id']]['loan_amount'];
+        }
+        return $farmer;
+    }
+
+    public function repay($id, $type = FarmerApplyModel::REPAY_REPAID) {
+        $data = [
+            'repaid_status' => $type,
+            'repaid_at'     => datetimeNow()
+        ];
+        $this->farmerRepository->farmerApplyModel->updateRecById($id, $data);
     }
 }

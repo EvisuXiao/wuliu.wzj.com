@@ -42,8 +42,7 @@ Route::group([
 ], function() {
     Route::get('list', 'FarmerController@list');
     Route::get('label', 'FarmerController@label');
-    Route::get('info', 'FarmerController@info');
-    Route::put('repay', 'FarmerController@repay');
+    Route::match(['get', 'put'], 'info', 'FarmerController@info');
     Route::match(['get', 'post', 'put'], 'apply', 'FarmerController@apply');
     Route::match(['get', 'post'], 'withdraw', 'FarmerController@withdraw');
     Route::get('withdrawLabel', 'FarmerController@withdrawLabel');
@@ -70,11 +69,14 @@ Route::group([
     Route::post('pool', 'BankController@pool');
     Route::get('farmerApply', 'BankController@farmerApply');
     Route::get('farmerApplyLabel', 'BankController@farmerApplyLabel');
+    Route::put('summary', 'BankController@summary');
 });
 
 Route::group([
     'prefix' => 'company',
 ], function() {
     Route::get('list', 'CompanyController@list');
-    Route::get('info', 'CompanyController@info');
+    Route::get('farmer', 'CompanyController@farmer');
+    Route::match(['get', 'put'], 'info', 'CompanyController@info');
+    Route::put('repay', 'CompanyController@repay');
 });

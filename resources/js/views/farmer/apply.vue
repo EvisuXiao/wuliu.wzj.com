@@ -11,7 +11,7 @@
 					<el-input :disabled="formDisabled" v-model="form.efficiency" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="订单数量(千克)" prop="quantity">
+			<el-form-item label="订单数量(吨)" prop="quantity">
 				<el-col :span="4">
 					<el-input :disabled="formDisabled" v-model="form.quantity" clearable></el-input>
 				</el-col>
@@ -31,7 +31,7 @@
 					<el-input :disabled="formDisabled" v-model="form.loan_month" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="合同金额">
+			<el-form-item label="合同金额(元)">
 				<el-col :span="4">
 					<el-input disabled :value="loanAmount"></el-input>
 				</el-col>
@@ -61,6 +61,11 @@
 				</el-col>
 			</el-form-item>
 			<div :style="{ display: form.status === 3 ? '' : 'none' }">
+				<el-form-item label="信用评分">
+					<el-col :span="4">
+						<el-input disabled :value="form.score"></el-input>
+					</el-col>
+				</el-form-item>
 				<el-form-item label="信用评级">
 					<el-col :span="4">
 						<el-input disabled :value="form.level"></el-input>
@@ -140,6 +145,7 @@
 					loan_amount: 0,
 					company_id: '',
 					bank_id: '',
+					score: 0,
 					level: '',
 					approval_amount: 0,
 					available_amount: 0,
@@ -185,7 +191,7 @@
 				return map[this.form.status];
 			},
 			loanAmount: function() {
-				return this.form.loan_amount = Math.round(this.form.price * this.form.quantity);
+				return this.form.loan_amount = Math.round(this.form.price * this.form.quantity * 1000);
 			}
 		},
 		methods: {

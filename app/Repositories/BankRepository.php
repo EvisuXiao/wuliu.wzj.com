@@ -96,15 +96,31 @@ class BankRepository extends BaseRepository
                 'apply_purpose'       => $item['purpose'],
                 'apply_loan_amount'   => $item['loan_amount'],
                 'apply_loan_month'    => $item['loan_month'],
+                'summary'             => $item['summary'] == 0.00 ? 0 : $item['summary'],
                 'status'              => $item['status'],
+                'repaid_status'       => $item['repaid_status'],
+                'score'               => $item['score'],
                 'level'               => $item['level'],
                 'approval_amount'     => $item['approval_amount'],
                 'expect_repaid_time'  => $item['expect_repaid_time'],
+                'repaid_at'           => $item['repaid_at'],
                 'commited_at'         => $item['commited_at'],
                 'passed_at'           => $item['passed_at'],
             ];
         }
         return !empty($farmer_id) ? $data[0] : $data;
+    }
+
+    public function summary($id) {
+        $loan_amount = $this->farmerRepository->farmerApplyModel->getRecInfoById($id, 'loan_amount');
+        $withdraw = $this->farmerRepository->farmerWithdrawModel->getRecList(['id', 'amount', 'interest'], ['farmer_id' => $id]);
+        $total = 0;
+        foreach($withdraw as $item) {
+            $total += ($item['amount'] + $item['interest']);
+        }
+        $summary = $loan_amount - $total;
+        $this->farmerRepository->farmerApplyModel->updateRecById($id, ['summary' => $summary]);
+        return $summary;
     }
 
     public function getScoreCfg() {
@@ -118,7 +134,7 @@ class BankRepository extends BaseRepository
 
     public function getAvgScore() {
         $score = array_values(array_only($this->getScore(), array_keys(BankScoreCfgModel::$score_type)));
-        return round(array_sum($score) / count($score), 5);
+        return round(array_sum($score), 5);
     }
 
     public function getLevel($score) {

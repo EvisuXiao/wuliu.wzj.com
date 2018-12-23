@@ -11,8 +11,6 @@ return [
         'amount'         => '金额',
         'purpose'        => '用途',
         'interest'       => '利息',
-        'repaid_at'      => '还款日',
-        'status'         => '状态',
         'created_at'     => '提款时间'
     ],
 
@@ -20,15 +18,12 @@ return [
         'width'    => [
             'id'             => 60,
             'purpose'        => 180,
-            'repaid_at'      => 160,
             'created_at'     => 160
         ],
         'sortable' => [
             'id'             => true,
             'amount'         => true,
             'interest'       => true,
-            'repaid_at'      => true,
-            'status'         => true,
             'created_at'     => true
         ],
     ]

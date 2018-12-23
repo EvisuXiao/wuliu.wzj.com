@@ -9,12 +9,12 @@ import BankFarmer from '../views/bank/farmer'
 import BankScore from '../views/bank/score'
 import BankCfg from '../views/bank/cfg'
 import BankPool from '../views/bank/pool'
-import FarmerList from '../views/farmer/list'
 import FarmerInfo from '../views/farmer/info'
 import FarmerApply from '../views/farmer/apply'
 import FarmerWithdraw from '../views/farmer/withdraw'
-import DealerList from '../views/dealer/list'
-import Company from '../views/company/index'
+import CompanyInfo from '../views/company/info'
+import CompanyFarmer from '../views/company/farmer'
+import CompanyDealer from '../views/company/dealer'
 import User from '../views/user/index'
 /* Layout */
 import Layout from '../views/layout/Layout'
@@ -96,6 +96,20 @@ export const asyncRouterMap = {
 	2: [
 		{
 			path: '/company',
+			name: 'Company-info',
+			redirect: '/company/info',
+			component: Layout,
+			meta: {title: '企业信息', icon: 'link'},
+			children: [
+				{
+					path: 'info',
+					component: CompanyInfo,
+					meta: {title: '经营信息', icon: 'link'}
+				}
+			]
+		},
+		{
+			path: '/company',
 			name: 'Company-farmer',
 			redirect: '/company/farmer',
 			component: Layout,
@@ -103,7 +117,7 @@ export const asyncRouterMap = {
 			children: [
 				{
 					path: 'farmer',
-					component: FarmerList,
+					component: CompanyFarmer,
 					meta: {title: '农户列表', icon: 'link'}
 				}
 			]
@@ -117,7 +131,7 @@ export const asyncRouterMap = {
 			children: [
 				{
 					path: 'dealer',
-					component: DealerList,
+					component: CompanyDealer,
 					meta: {title: '经销商列表', icon: 'link'}
 				},
 			]

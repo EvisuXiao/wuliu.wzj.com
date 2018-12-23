@@ -10,7 +10,6 @@ namespace App\Http\Controllers;
 
 
 use App\Models\ScModels\FarmerApplyModel;
-use App\Repositories\AdminRepository;
 use App\Repositories\FarmerRepository;
 
 class FarmerController extends Controller
@@ -27,7 +26,12 @@ class FarmerController extends Controller
     }
 
     public function info() {
-        return $this->succReturn($this->farmerRepository->getFarmerInfo());
+        if(self::isGet()) {
+            return $this->succReturn($this->farmerRepository->getFarmerInfo());
+        } else {
+            $this->farmerRepository->farmerExtendModel->updateRec($this->payload);
+            return $this->succReturn();
+        }
     }
     
     public function apply() {
@@ -48,8 +52,14 @@ class FarmerController extends Controller
 
     public function withdraw() {
         if(self::isGet()) {
+            $info = $this->farmerRepository->farmerApplyModel->getRecInfoById(self::$uid, ['id', 'repaid_status', 'repaid_at']);
             $list = $this->farmerRepository->farmerWithdrawModel->getRecList([DB_SELECT_ALL], ['farmer_id' => self::$uid]);
-            return $this->succReturn($list);
+            $data = [
+                'repaid_status' => $info['repaid_status'] ?? 0,
+                'repaid_time'     => $info['repaid_at'] ?? '',
+                'list'          => $list
+            ];
+            return $this->succReturn($data);
         } else {
             $do = $this->farmerRepository->doWithdraw($this->payload['amount'], $this->payload['purpose']);
             return $do ? $this->succReturn() : $this->failReturn();
@@ -59,14 +69,5 @@ class FarmerController extends Controller
     public function withdrawLabel() {
         $this->label = 'farmerWithdraw';
         return $this->label();
-    }
-
-    public function repay() {
-        $data = [
-            'status'    => $this->payload['type'],
-            'repaid_at' => datetimeNow()
-        ];
-        $this->farmerRepository->farmerWithdrawModel->updateRecById($this->payload['id'], $data);
-        return $this->succReturn();
     }
 }

@@ -76,24 +76,14 @@
 					buttons: [
 						{
 							visible: row => {
-								return row.status === 0
+								return row.repaid_status === 0 || row.repaid_status === 2
 							},
-							label: '通过',
+							label: '合同执行',
 							icon: 'el-icon-check',
 							handler: row => {
-								this.rowOpt(1, row.id)
+								this.rowOpt(row.status === 0 ? 1 : 3, row.id)
 							},
 						},
-						{
-							visible: row => {
-								return row.status === 1
-							},
-							label: '拒绝',
-							icon: 'el-icon-close',
-							handler: row => {
-								this.rowOpt(0, row.id)
-							},
-						}
 					]
 				},
 				filters: [
@@ -127,7 +117,7 @@
 			},
 			refreshTable() {
 				request({
-					url: '/farmer/list'
+					url: '/company/farmer'
 				}).then(response => {
 					this.data = response.data;
 					this.listLoading = false
@@ -145,41 +135,16 @@
 				}
 			},
 			rowOpt(opt, id) {
-				let ids = {};
-				if(id !== undefined) {
-					if(id < 1) {
-						this.$message({
-							type: 'warning',
-							message: '实例有误'
-						});
-						return;
-					}
-					ids = id;
-				} else {
-					if(this.multiSelection.length < 1) {
-						this.$message({
-							type: 'warning',
-							message: '没有选中实例'
-						});
-						return;
-					}
-					ids = this.multiSelection;
-				}
-				const labelMsg = {
-					'0': '禁用',
-					'1': '启用'
-				};
-				const cfm = '是否' + labelMsg[opt] + '实例' + (id === undefined ? '(' + this.multiSelection.length + ')' : '');
-				this.$confirm(cfm, '提示', {
+				this.$confirm('是否执行合同', '提示', {
 					confirmButtonText: '确定',
 					cancelButtonText: '取消',
 				}).then(() => {
 					request({
-						url: '/farmer/opt',
+						url: '/company/repay',
 						method: 'PUT',
 						data: {
-							id: ids,
-							type: opt
+							id: id,
+							opt: opt
 						}
 					}).then(response => {
 						this.$message({

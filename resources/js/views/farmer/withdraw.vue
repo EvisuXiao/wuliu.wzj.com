@@ -1,5 +1,17 @@
 <template>
 	<div class="app-container">
+		<el-row style="margin: 20px 0">
+			<el-col :sm="3">
+				<span>还款状态:</span>
+				<el-tag :type="statusClass(repaid_status)">{{ statusFormatter(repaid_status) }}</el-tag>
+			</el-col>
+			<div v-if="repaid_time">
+				<el-col :sm="3"></el-col>
+				<el-col :sm="6">
+					还款时间: {{ repaid_time }}
+				</el-col>
+			</div>
+		</el-row>
 		<data-tables :data.sync="data" ref="table" :table-props="tableProps" :filters="filters"
 		             @row-click="clickThenSelect"
 		             @selection-change="setMultiSelection">
@@ -15,15 +27,15 @@
 				</el-col>
 			</el-row>
 			<el-table-column type="selection" :fixed="true"></el-table-column>
-			<el-table-column v-bind="rowTool.props">
-				<template slot-scope="scope">
-					<el-tooltip v-for="button in rowTool.buttons" :key="button.icon"
-					            v-if="!button.hasOwnProperty('visible') || button.visible(scope.row)" placement="top"
-					            :content="button.label">
-						<el-button type="text" :icon="button.icon" @click="button.handler(scope.row)"></el-button>
-					</el-tooltip>
-				</template>
-			</el-table-column>
+			<!--<el-table-column v-bind="rowTool.props">-->
+				<!--<template slot-scope="scope">-->
+					<!--<el-tooltip v-for="button in rowTool.buttons" :key="button.icon"-->
+					            <!--v-if="!button.hasOwnProperty('visible') || button.visible(scope.row)" placement="top"-->
+					            <!--:content="button.label">-->
+						<!--<el-button type="text" :icon="button.icon" @click="button.handler(scope.row)"></el-button>-->
+					<!--</el-tooltip>-->
+				<!--</template>-->
+			<!--</el-table-column>-->
 			<el-table-column v-for="title in titles" :key="title.prop" v-bind="title">
 				<template slot-scope="scope">
 					<el-tag v-if="title.prop === 'status'" :type="statusClass(scope.row.status)">{{
@@ -44,6 +56,8 @@
 		data() {
 			return {
 				data: [],
+				repaid_status: 0,
+				repaid_time: '',
 				multiSelection: [],
 				titles: [],
 				labelMaps: {},
@@ -77,16 +91,7 @@
 						align: 'center',
 					},
 					buttons: [
-						{
-							visible: row => {
-								return row.status === 0 || row.status === 2
-							},
-							label: '还款',
-							icon: 'el-icon-check',
-							handler: row => {
-								this.rowOpt(row.status === 0 ? 1 : 3, row.id)
-							},
-						}
+
 					]
 				},
 				filters: [
@@ -122,7 +127,9 @@
 				request({
 					url: '/farmer/withdraw'
 				}).then(response => {
-					this.data = response.data;
+					this.data = response.data.list;
+					this.repaid_status = response.data.repaid_status;
+					this.repaid_time = response.data.repaid_time;
 					this.listLoading = false
 				})
 			},
@@ -154,37 +161,6 @@
 					3: '逾期已还款'
 				};
 				return map[status]
-			},
-			rowOpt(opt, id) {
-				if(id < 1) {
-					this.$message({
-						type: 'warning',
-						message: '记录有误'
-					});
-					return;
-				}
-				const cfm = '是否还款';
-				this.$confirm(cfm, '提示', {
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
-				}).then(() => {
-					request({
-						url: '/farmer/repay',
-						method: 'PUT',
-						data: {
-							id: id,
-							type: opt
-						}
-					}).then(response => {
-						this.$message({
-							type: 'success',
-							message: response.message
-						});
-						this.refreshTable()
-					}).catch(() => {
-					})
-				}).catch(() => {
-				});
 			}
 		}
 	}

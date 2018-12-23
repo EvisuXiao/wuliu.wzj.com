@@ -44,6 +44,7 @@ class BankController extends Controller
         $data = ['status' => $this->payload['type']];
         if($this->payload['type'] == FarmerApplyModel::STATUS_PASSEDED) {
             $info = $this->payload['info'];
+            $data['score'] = $info['score'];
             $data['level'] = $info['level'];
             $data['available_amount'] = $data['approval_amount'] = $info['approval_amount'];
             $data['passed_at'] = datetimeNow();
@@ -51,6 +52,11 @@ class BankController extends Controller
         }
         $this->bankRepository->farmerRepository->farmerApplyModel->updateRecById($this->payload['id'], $data);
         return $this->succReturn();
+    }
+
+    public function summary() {
+        $summary = $this->bankRepository->summary($this->payload['id']);
+        return $this->succReturn([], sprintf('结算金额%s元', $summary));
     }
 
     public function applyScore() {

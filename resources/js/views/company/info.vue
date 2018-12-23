@@ -1,29 +1,29 @@
 <template>
 	<div class="app-container">
 		<el-form ref="form" :model="form" label-width="150px" size="small">
-			<el-form-item label="农作物" prop="crop">
+			<el-form-item label="接收原料" prop="material">
 				<el-col :span="4">
-					<el-input v-model="form.crop" clearable></el-input>
+					<el-input v-model="form.material" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="土地面积(亩)" prop="land">
+			<el-form-item label="制造工艺" prop="product">
 				<el-col :span="4">
-					<el-input v-model="form.land" clearable></el-input>
+					<el-input v-model="form.product" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="产出能力(千克/亩)" prop="productivity">
+			<el-form-item label="产品销量" prop="sales">
 				<el-col :span="4">
-					<el-input v-model="form.productivity" clearable></el-input>
+					<el-input v-model="form.sales" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="生产成本(元)" prop="cost">
-				<el-col :span="4">
-					<el-input v-model="form.cost" clearable></el-input>
-				</el-col>
-			</el-form-item>
-			<el-form-item label="个人资产" prop="asset">
+			<el-form-item label="企业资产" prop="asset">
 				<el-col :span="4">
 					<el-input v-model="form.asset" clearable></el-input>
+				</el-col>
+			</el-form-item>
+			<el-form-item label="企业负债" prop="debt">
+				<el-col :span="4">
+					<el-input v-model="form.debt" clearable></el-input>
 				</el-col>
 			</el-form-item>
 			<el-form-item>
@@ -41,11 +41,11 @@
 			return {
 				form: {
 					id: 0,
-					land: 0,
-					crop: '',
-					productivity: 0,
-					cost: 0,
-					asset: 0
+					material: '',
+					product: '',
+					sales: 0,
+					asset: 0,
+					debt: 0
 				},
 			}
 		},
@@ -55,7 +55,7 @@
 		methods: {
 			getInfo() {
 				request({
-					url: '/farmer/info'
+					url: '/company/info'
 				}).then(response => {
 					const data = response.data;
 					for(let i in this.form) {
@@ -71,7 +71,7 @@
 					cancelButtonText: '取消',
 				}).then(() => {
 					request({
-						url: '/farmer/info',
+						url: '/company/info',
 						method: 'put',
 						data: this.form
 					}).then(response => {

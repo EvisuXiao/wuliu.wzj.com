@@ -25,8 +25,22 @@ class CompanyController extends Controller
         return $this->succReturn($this->companyRepository->getCompanyList());
     }
 
+    public function farmer() {
+        return $this->succReturn($this->companyRepository->getFarmerList());
+    }
+
     public function info($id = 0) {
         $id = $id ?: self::$uid;
-        return $this->succReturn($this->companyRepository->getCompanyInfo($id));
+        if(self::isGet()) {
+            return $this->succReturn($this->companyRepository->getCompanyInfo($id));
+        } else {
+            $this->companyRepository->companyExtendModel->updateRec($this->payload);
+            return $this->succReturn();
+        }
+    }
+
+    public function repay() {
+        $this->companyRepository->repay($this->payload['id'], $this->payload['opt']);
+        return $this->succReturn();
     }
 }
