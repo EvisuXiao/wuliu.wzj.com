@@ -73,17 +73,17 @@
 						<el-input v-model="farmer2Form.land" clearable></el-input>
 					</el-col>
 				</el-form-item>
-				<el-form-item label="产能(千克/亩)" prop="productivity">
+				<el-form-item label="产能(吨/亩)" prop="productivity">
 					<el-col :span="4">
 						<el-input v-model="farmer2Form.productivity" clearable></el-input>
 					</el-col>
 				</el-form-item>
-				<el-form-item label="生产成本(元)" prop="cost">
+				<el-form-item label="生产成本(万元)" prop="cost">
 					<el-col :span="4">
 						<el-input v-model="farmer2Form.cost" clearable></el-input>
 					</el-col>
 				</el-form-item>
-				<el-form-item label="个人资产" prop="asset">
+				<el-form-item label="个人资产(万元)" prop="asset">
 					<el-col :span="4">
 						<el-input v-model="farmer2Form.asset" clearable></el-input>
 					</el-col>

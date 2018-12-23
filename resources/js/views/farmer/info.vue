@@ -11,17 +11,17 @@
 					<el-input v-model="form.land" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="产出能力(千克/亩)" prop="productivity">
+			<el-form-item label="产出能力(吨/亩)" prop="productivity">
 				<el-col :span="4">
 					<el-input v-model="form.productivity" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="生产成本(元)" prop="cost">
+			<el-form-item label="生产成本(万元)" prop="cost">
 				<el-col :span="4">
 					<el-input v-model="form.cost" clearable></el-input>
 				</el-col>
 			</el-form-item>
-			<el-form-item label="个人资产" prop="asset">
+			<el-form-item label="个人资产(万元)" prop="asset">
 				<el-col :span="4">
 					<el-input v-model="form.asset" clearable></el-input>
 				</el-col>

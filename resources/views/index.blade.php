@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="csrf-token" content="{{ csrf_token() }}">
-		<title>供应链金融管理后台</title>
+		<title>农业供应链金融平台</title>
 	</head>
 	<body>
 		<div id="app"></div>

@@ -29,8 +29,8 @@
 					<el-tag v-if="title.prop === 'status'" :type="statusClass(scope.row.status, 1)">{{
 						statusFormatter(scope.row.status, 1) }}
 					</el-tag>
-					<el-tag v-else-if="title.prop === 'repaid_status'" :type="statusClass(scope.row.status, 2)">{{
-						statusFormatter(scope.row.status, 2) }}
+					<el-tag v-else-if="title.prop === 'repaid_status'" :type="statusClass(scope.row.repaid_status, 2)">{{
+						statusFormatter(scope.row.repaid_status, 2) }}
 					</el-tag>
 					<span v-else>{{ scope.row[title.prop] }}</span>
 				</template>
