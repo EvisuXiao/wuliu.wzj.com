@@ -81,7 +81,7 @@
 							label: '合同执行',
 							icon: 'el-icon-check',
 							handler: row => {
-								this.rowOpt(row.status === 0 ? 1 : 3, row.id)
+								this.rowOpt(row.repaid_status === 0 ? 1 : 3, row.id)
 							},
 						},
 					]
