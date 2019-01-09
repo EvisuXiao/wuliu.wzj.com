@@ -44,8 +44,14 @@ class BankRepository extends BaseRepository
         $this->companyRepository = $companyRepository;
     }
 
+    /**
+     * 获取银行列表
+     * @return array
+     */
     public function getBankList() {
+        // 基本信息
         $list = $this->bankModel->getRecList();
+        // 经营信息
         $more = $this->bankExtendModel->getInfoWithIndex(array_column($list, 'id'));
         $data = [];
         foreach($list as $item) {
@@ -56,12 +62,22 @@ class BankRepository extends BaseRepository
         return $data;
     }
 
+    /**
+     * 获取银行信息
+     * @param $id
+     * @return array
+     */
     public function getBankInfo($id) {
         $info = $this->bankModel->getRecInfoById($id);
         $more = $this->bankExtendModel->getRecInfoById($id);
         return array_merge($info, $more);
     }
 
+    /**
+     * 获取农户订单
+     * @param int $farmer_id
+     * @return array
+     */
     public function getFarmerApply($farmer_id = 0) {
         $where = ['bank_id' => self::$uid];
         !empty($farmer_id) && $where['id'] = $farmer_id;
@@ -70,6 +86,7 @@ class BankRepository extends BaseRepository
             return [];
         }
         $data = [];
+        // 集成农户基本信息, 经营信息, 订单信息
         foreach($list as $item) {
             if(!in_array($item['status'], [FarmerApplyModel::STATUS_COMMITED, FarmerApplyModel::STATUS_PASSEDED])) {
                 continue;
@@ -111,18 +128,31 @@ class BankRepository extends BaseRepository
         return !empty($farmer_id) ? $data[0] : $data;
     }
 
+    /**
+     * 银行为农户结算金额
+     * @param $id
+     * @return float
+     */
     public function summary($id) {
+        // 合同金额
         $loan_amount = $this->farmerRepository->farmerApplyModel->getRecInfoById($id, 'loan_amount');
+        // 提款信息
         $withdraw = $this->farmerRepository->farmerWithdrawModel->getRecList(['id', 'amount', 'interest'], ['farmer_id' => $id]);
         $total = 0;
         foreach($withdraw as $item) {
+            // 提款本息合计
             $total += ($item['amount'] + $item['interest']);
         }
+        // 农户结余
         $summary = $loan_amount - $total;
         $this->farmerRepository->farmerApplyModel->updateRecById($id, ['summary' => $summary]);
         return $summary;
     }
 
+    /**
+     * 银行打分配置
+     * @return array
+     */
     public function getScoreCfg() {
         $info = $this->bankScoreCfgModel->getRecInfoById(self::$uid);
         if(!empty($info)) {
@@ -132,11 +162,20 @@ class BankRepository extends BaseRepository
         return $this->bankScoreCfgModel->getRecInfoById(self::$uid);
     }
 
+    /**
+     * 获取当前总分权重
+     * @return float
+     */
     public function getAvgScore() {
         $score = array_values(array_only($this->getScore(), array_keys(BankScoreCfgModel::$score_type)));
         return round(array_sum($score), 5);
     }
 
+    /**
+     * 评分对应评级
+     * @param $score
+     * @return string
+     */
     public function getLevel($score) {
         if($score >= 0.85) {
             $level = 'A';
@@ -150,6 +189,10 @@ class BankRepository extends BaseRepository
         return $level;
     }
 
+    /**
+     * 获取各项打分当前权重
+     * @return array
+     */
     public function getScore() {
         $info = $this->bankScoreModel->getRecInfoById(self::$uid);
         if(!empty($info)) {
@@ -159,6 +202,10 @@ class BankRepository extends BaseRepository
         return $this->bankScoreModel->getRecInfoById(self::$uid);
     }
 
+    /**
+     * 更新分数权重
+     * @param $data
+     */
     protected function updateScore($data) {
         $info = $this->bankScoreModel->getRecInfoById(self::$uid);
         if(!empty($info)) {
@@ -169,21 +216,31 @@ class BankRepository extends BaseRepository
         }
     }
 
+    /**
+     * 打分池操作
+     * 归一化运算
+     * @param array $data 新一组评分
+     */
     public function scorePool($data) {
         $serial = 0;
         $max = [];
         $min = [];
         $score = [];
+        // 历史打分池
         $list = $this->bankScorePoolModel->getRecList([DB_SELECT_ALL], ['bank_id' => self::$uid], ['serial' => DB_SORT_ASC, 'id' => DB_SORT_ASC]);
         foreach($list as $item) {
+            // 历史最大录入次序
             $serial = max($serial, $item['serial']);
+            // 遍历打分项
             foreach($item as $key => $value) {
                 if(in_array($key, array_keys(BankScoreCfgModel::$score_type))) {
+                    // 该项历史最大值
                     if(!isset($max[$key])) {
                         $max[$key] = $value;
                     } else {
                         $max[$key] = max($value, $max[$key]);
                     }
+                    // 该项历史最小值
                     if(!isset($min[$key])) {
                         $min[$key] = $value;
                     } else {
@@ -192,27 +249,36 @@ class BankRepository extends BaseRepository
                 }
             }
         }
+        // 银行打分基础权重
         $cfg = $this->getScoreCfg();
+        // 新一组权重代入打分池
         foreach($data as $key => $value) {
             if(!isset($max[$key]) || !isset($min[$key])) {
                 $score[$key] = 1;
             } else {
+                // 该项当前最大值
                 $cur_max = max($max[$key], $value);
+                // 该项当前最小值
                 $cur_min = min($min[$key], $value);
                 if($cur_max == $cur_min) {
                     $score[$key] = 1;
                 }
                 if(BankScoreCfgModel::$score_type[$key] == BankScoreCfgModel::TYPE_MORE) {
+                    // 该项如果是值越大越好, 采用(当前值 - 最小值) / (最大值 - 最小值)
                     $score[$key] = ($value - $cur_min) / ($cur_max - $cur_min);
                 } else {
+                    // 该项如果是值越小越好, 采用(最大值 - 当前值) / (最大值 - 最小值)
                     $score[$key] = ($cur_max - $value) / ($cur_max - $cur_min);
                 }
             }
+            // 结果乘基础权重
             $score[$key] = round($score[$key] * $cfg[$key], 5);
         }
+        // 新一组打分数据存入打分池
         $data['bank_id'] = self::$uid;
         $data['serial'] = $serial + 1;
         $this->bankScorePoolModel->addRec($data);
+        // 更新权重终值
         $this->updateScore($score);
     }
 }
